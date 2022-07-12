@@ -1,0 +1,94 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.fft as sp
+path1 ='new_Medicionreal_400RPM_con amortiguador.xlsx'
+path2 ='new_Medicionreal_500RPM_con amortiguador.xlsx'
+path3 ='new_Medicionreal_600RPM_con amortiguador.xlsx'
+
+
+df1 = pd.read_excel(path1)
+df2 = pd.read_excel(path2)
+df3 = pd.read_excel(path3)
+
+tiempo1 = df1['tiempo'].values
+mediciones1 = df1['Medición-1'].values
+
+tiempo2 = df2['tiempo'].values
+mediciones2 = df2['Medición-1'].values
+
+tiempo3 = df3['tiempo'].values
+mediciones3 = df3['Medición-1'].values
+
+x_ondas=[tiempo1,tiempo2,tiempo3]
+y_ondas=[mediciones1,mediciones2,mediciones3]
+fig1 = plt.figure(figsize=(15,15))
+fig1.tight_layout()
+colores = ['blue','green','red','cyan','magenta','yellow','black','white']
+tit=['Forma de onda MMA8452Q 400 RPM Amortiguado',
+    'Forma de onda MMA8452Q 500 RPM Amortiguado',
+    'Forma de onda MMA8452Q 600 RPM Amortiguado']
+for i in range(0,3):
+    ax1 = plt.subplot(3,1,i+1)
+    ax1.plot(x_ondas[i],y_ondas[i],color = colores[i])
+    ax1.set_xlabel('Tiempo [s]')
+    ax1.set_ylabel('Aceleraciones [g]')
+    ax1.set_title(tit[i])
+    
+    
+#Calculos para hacer FFT
+
+X1 = sp.fft(mediciones1)
+N = len(X1)
+n = np.arange(N)
+# get the sampling rate
+sr = (16)
+T = N/sr
+freq = n/T 
+
+# Get the one-sided specturm
+n_oneside = N//2
+# get the one side frequency
+f_oneside1 = freq[:n_oneside]
+X2 = sp.fft(mediciones2)
+N = len(X2)
+n = np.arange(N)
+# get the sampling rate
+sr = (16)
+T = N/sr
+freq = n/T 
+
+# Get the one-sided specturm
+n_oneside = N//2
+# get the one side frequency
+f_oneside2 = freq[:n_oneside]
+X3 = sp.fft(mediciones3)
+N = len(X3)
+n = np.arange(N)
+# get the sampling rate
+sr = (16)
+T = N/sr
+freq = n/T 
+
+# Get the one-sided specturm
+n_oneside = N//2
+# get the one side frequency
+f_oneside3 = freq[:n_oneside]
+
+#Graficos FFT
+
+x_FFT=[f_oneside1,f_oneside2,f_oneside3]
+y_FFT=[np.abs(X1[:n_oneside]),np.abs(X2[:n_oneside]),np.abs(X3[:n_oneside])]
+
+fig2 = plt.figure(figsize=(15,15))
+fig2.tight_layout()
+colores = ['blue','green','red','cyan','magenta','yellow','black','white']
+tit=['FFT MMA8452Q 400 RPM Amortiguado',
+    'FFT MMA8452Q 500 RPM Amortiguado',
+    'FFT MMA8452Q 600 RPM Amortiguado']
+for i in range(0,3):
+    ax1 = plt.subplot(3,1,i+1)
+    ax1.plot(x_FFT[i],y_FFT[i],color = colores[i])
+    ax1.set_xlabel('Freq [Hz]')
+    ax1.set_ylabel('Amplitud FFT')
+    ax1.set_title(tit[i])
